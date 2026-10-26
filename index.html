@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cybersecurity Listening | Two-Factor Authentication</title>
+<style>
+:root{--ink:#17253b;--muted:#627087;--line:#dce4ee;--panel:#fff;--wash:#f3f7fb;--blue:#2457d6;--blue2:#eaf0ff;--green:#16784a;--greenbg:#e9f8ef;--red:#b42318;--redbg:#fff0ee;--gold:#9a6700}
+*{box-sizing:border-box}
+body{margin:0;background:var(--wash);color:var(--ink);font:17px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.wrap{width:min(100%,980px);margin:0 auto;padding:28px 18px 64px}
+.hero{background:linear-gradient(135deg,#132a52,#2457d6);color:#fff;border-radius:22px;padding:28px 30px;margin-bottom:18px;box-shadow:0 10px 28px #1d3e7218}
+.eyebrow{text-transform:uppercase;letter-spacing:.12em;font-size:.76rem;font-weight:800;opacity:.8}
+h1{font-size:clamp(1.8rem,4vw,2.65rem);line-height:1.12;margin:.35rem 0 .7rem}
+.hero p{margin:0;color:#eaf0ff;max-width:720px}
+.pill{display:inline-flex;align-items:center;gap:7px;border:1px solid #ffffff4d;background:#ffffff12;border-radius:999px;padding:5px 11px;font-size:.84rem;margin-top:16px}
+.panel,.question-card{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:0 4px 16px #1c35540a}
+.panel{padding:22px;margin:16px 0}
+.panel h2{font-size:1.18rem;margin:0 0 7px}
+.muted{color:var(--muted)}
+.audio-main{width:100%;margin-top:10px}
+.audio-note{font-size:.88rem;color:var(--muted);margin-top:7px}
+.progress-row{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:18px 0 8px;font-size:.92rem;font-weight:700}
+.progress-track{height:8px;border-radius:99px;background:#e3eaf4;overflow:hidden}
+.progress-fill{height:100%;width:0;background:var(--blue);transition:width .18s ease}
+.question-card{padding:22px;margin:14px 0}
+.qtop{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.qtag{display:inline-grid;place-items:center;min-width:44px;height:34px;padding:0 10px;border-radius:10px;background:var(--blue2);color:var(--blue);font-size:.9rem;font-weight:850}
+.qtype{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800}
+h3{font-size:1.08rem;line-height:1.4;margin:0 0 15px}
+.options{display:grid;gap:10px;border:0;padding:0;margin:0}
+.option{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;cursor:pointer;background:#fff;transition:border-color .12s,background .12s}
+.option:hover{border-color:#9bb5f8;background:#f9fbff}
+.option input{margin-top:5px;accent-color:var(--blue);width:18px;height:18px;flex:0 0 auto}
+.option-letter{font-weight:850;color:#45546b;min-width:22px}
+.option-text{flex:1}
+.gap-sentence{font-size:1.05rem;line-height:2.25;margin:0;padding:13px 14px;background:#f8faff;border:1px solid #e2e9f6;border-radius:12px}
+.gap-input{display:inline-block;width:min(210px,42vw);min-width:115px;border:0;border-bottom:2px solid var(--blue);border-radius:5px 5px 0 0;background:#fff;padding:5px 8px;margin:0 4px;font:inherit;color:var(--ink);outline:none}
+.gap-input:focus{box-shadow:0 0 0 3px #2457d620;border-bottom-color:#173da5}
+.gap-input:disabled{background:#f0f3f7;color:#43516a}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:22px 0}
+button{font:inherit;cursor:pointer}
+.primary,.secondary,.toggle-transcript,.retry{border-radius:12px;padding:12px 17px;font-weight:800;border:1px solid transparent}
+.primary{background:var(--blue);color:#fff}
+.primary:disabled{background:#a8b5cc;cursor:not-allowed}
+.secondary,.retry{background:#fff;border-color:var(--line);color:var(--ink)}
+.helper{font-size:.9rem;color:var(--muted)}
+.results{border-radius:18px;padding:22px;margin:20px 0;border:1px solid var(--line);background:#fff}
+.results h2{margin:0 0 6px}
+.scoreline{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.scorebig{font-size:2rem;font-weight:900;letter-spacing:-.04em}
+.feedback{margin-top:16px;border-radius:12px;padding:13px 15px;font-size:.94rem}
+.feedback.correct{background:var(--greenbg);border:1px solid #b9e8c9;color:#145b3b}
+.feedback.incorrect{background:var(--redbg);border:1px solid #f5c4bf;color:#8f1b13}
+.feedback strong{display:block;margin-bottom:3px}
+.post-submit{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.post-submit[hidden],.transcript[hidden],.results[hidden],.feedback[hidden],.post-submit .transcript[hidden]{display:none!important}
+.clip-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.clip-row audio{width:min(100%,390px);height:42px}
+.clip-note{font-size:.84rem;color:var(--muted)}
+.toggle-transcript{padding:9px 13px;background:#f3f6fb;border-color:var(--line);font-size:.9rem}
+.transcript{margin-top:14px;background:#f7f9fc;border:1px solid var(--line);border-radius:13px;padding:15px}
+.transcript-hint{font-size:.84rem;color:var(--muted);margin:0 0 10px}
+.turn{margin:8px 0 12px}
+.speaker{font-size:.76rem;text-transform:uppercase;letter-spacing:.07em;color:#68768c;font-weight:850;margin-bottom:3px}
+.word{border:0;background:transparent;color:inherit;padding:0 1px;border-radius:3px;display:inline;font:inherit;text-decoration:underline;text-decoration-color:#9bb5f8;text-decoration-thickness:1px;text-underline-offset:3px;cursor:pointer}
+.word:hover,.word:focus{background:#dce7ff;outline:2px solid #a9c1ff;outline-offset:1px}
+.dictionary{position:fixed;z-index:100;left:50%;bottom:18px;transform:translateX(-50%);width:min(560px,calc(100vw - 24px));background:#14233c;color:#fff;border:1px solid #344765;border-radius:16px;padding:17px 18px;box-shadow:0 18px 55px #06152c55}
+.dictionary[hidden]{display:none}
+.dict-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.dict-word{font-size:1.2rem;font-weight:900;margin:0}
+.dict-pos{display:inline-block;font-size:.75rem;font-weight:800;background:#29456d;color:#dce8ff;border-radius:7px;padding:3px 7px;margin:6px 0 9px}
+.dict-close{background:#ffffff15;color:#fff;border:1px solid #ffffff30;border-radius:8px;padding:4px 9px}
+.dict-ipa{font-size:1rem;color:#c5d7ff;margin:0 0 7px}
+.dict-definition{margin:0;color:#f0f4fb}
+.footer-note{font-size:.84rem;color:var(--muted);margin-top:12px}
+@media(max-width:600px){.wrap{padding:15px 11px 50px}.hero{padding:23px 20px;border-radius:17px}.panel,.question-card{padding:17px;border-radius:15px}.question-card{margin:11px 0}.gap-sentence{font-size:1rem}.gap-input{width:130px}.dictionary{bottom:8px}.actions>*{width:100%}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="hero">
+    <div class="eyebrow">Listening practice · Cybersecurity</div>
+    <h1>Protect Your Accounts with 2FA</h1>
+    <p>Listen to the recording and complete all eight questions. After you submit, you can replay each question, check your answers, and open the transcript.</p>
+    <div class="pill">8 questions <span aria-hidden="true">•</span> Multiple choice + gap fill</div>
+  </header>
+
+
+  <div class="progress-row"><span id="progress-label">0 of 8 answered</span><span id="progress-hint">Answer every question to submit</span></div>
+  <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progress-fill"></div></div>
+
+  <form id="quiz-form" novalidate>
+    <div id="questions"></div>
+    <div class="actions">
+      <button class="primary" id="submit-btn" type="submit" disabled>Submit answers</button>
+      <span class="helper" id="submit-help">Complete all 8 questions to unlock submission.</span>
+      <button class="retry" id="retry-btn" type="button" hidden>Try again</button>
+    </div>
+  </form>
+
+  <section class="results" id="results" hidden aria-live="polite"></section>
+  <p class="footer-note">Teacher setup: put the exported clips <strong>Q1.mp3–Q8.mp3</strong> in the same folder as this HTML file. The page works offline and uses no external libraries.</p>
+</main>
+
+<div class="dictionary" id="dictionary" role="dialog" aria-live="polite" aria-label="Word help" hidden>
+  <div class="dict-top">
+    <div>
+      <p class="dict-word" id="dict-word"></p>
+      <span class="dict-pos" id="dict-pos"></span>
+    </div>
+    <button class="dict-close" id="dict-close" type="button" aria-label="Close word help">Close</button>
+  </div>
+  <p class="dict-ipa" id="dict-ipa"></p>
+  <p class="dict-definition" id="dict-definition"></p>
+</div>
+
+<script>
+const QUESTIONS = [{"id": "Q1", "type": "mcq", "stem": "Which benefit of 2FA is NOT mentioned?", "options": [{"key": "A", "text": "It is a way to improve the security of your accounts online."}, {"key": "B", "text": "It is a good method to stop people from accessing your accounts."}, {"key": "C", "text": "It is an easy process to set it up in all your online accounts."}], "answer": "C", "answerText": "C. It is an easy process to set it up in all your online accounts.", "start": 16.0, "end": 29.8, "transcript": [{"speaker": "Speaker 2", "text": "Two-factor authentication is a method of enhancing your online security by requiring 2 forms of verification instead of just a password."}, {"speaker": "Speaker 2", "text": "It's a highly effective way to reduce the risk of unauthorized access."}]}, {"id": "Q2", "type": "gap", "stem": "Complete Step 1.", "before": "Activate 2FA in account ", "after": ".", "accepted": ["settings"], "answerText": "settings", "start": 35.0, "end": 46.8, "transcript": [{"speaker": "Speaker 2", "text": "The first step is to activate 2FA on the account you want to secure."}, {"speaker": "Speaker 2", "text": "You usually do this by going to the security or privacy section in the account settings."}]}, {"id": "Q3", "type": "gap", "stem": "Complete Step 2.", "before": "Select your second authentication factor, e.g. ", "after": " a code via SMS.", "accepted": ["receiving"], "answerText": "receiving", "start": 58.0, "end": 70.8, "transcript": [{"speaker": "Speaker 2", "text": "You'll need to select your second authentication factor."}, {"speaker": "Speaker 2", "text": "The most common options include receiving a code by SMS, using an authentication app, or verifying via e-mail."}]}, {"id": "Q4", "type": "gap", "stem": "Complete Step 4.", "before": "", "after": " the app to your account by scanning the QR code.", "accepted": ["link", "connect"], "answerText": "link / connect", "start": 108.0, "end": 138.8, "transcript": [{"speaker": "Speaker 2", "text": "After installing the app, you'll need to link it to your account."}, {"speaker": "Speaker 2", "text": "I think most websites will show you a QR code that you can scan with the app, but it might depend slightly on the platform."}, {"speaker": "Speaker 2", "text": "Just open the app, tap on add account or the plus sign, and then use your phone's camera to scan the QR code shown on the website."}, {"speaker": "Speaker 2", "text": "The app will then automatically connect to your account and start generating codes."}]}, {"id": "Q5", "type": "gap", "stem": "Complete Step 5.", "before": "Enter the code generated by the app into ", "after": " to complete setup.", "accepted": ["website", "the website"], "answerText": "website / the website", "start": 142.0, "end": 154.8, "transcript": [{"speaker": "Speaker 2", "text": "You'll be prompted to enter the first code generated by the app into the website."}, {"speaker": "Speaker 2", "text": "This step confirms the setup is working correctly."}, {"speaker": "Speaker 2", "text": "Once it's accepted, 2FA will be enabled on your account."}]}, {"id": "Q6", "type": "mcq", "stem": "It is important to have backup options in case you lose access to your phone. For example,", "options": [{"key": "A", "text": "adding a second email for account recovery."}, {"key": "B", "text": "creating a set of new passwords."}, {"key": "C", "text": "saving your codes in a note-taking app."}], "answer": "A", "answerText": "A. adding a second email for account recovery.", "start": 164.0, "end": 188.0, "transcript": [{"speaker": "Speaker 2", "text": "But what's equally important is setting up a backup method in case you lose access to your phone."}, {"speaker": "Speaker 1", "text": "Right. What kind of backup options are there?"}, {"speaker": "Speaker 2", "text": "Good question."}, {"speaker": "Speaker 2", "text": "Most services allow you to generate backup codes, which you can store safely and use when needed."}, {"speaker": "Speaker 2", "text": "Others may let you add a secondary e-mail address or another trusted device."}]}, {"id": "Q7", "type": "mcq", "stem": "If you replace your device, you should", "options": [{"key": "A", "text": "immediately change all your passwords and login details."}, {"key": "B", "text": "set up the authentication app again on your new phone."}, {"key": "C", "text": "use your backup phone instead of your new phone, just in case."}], "answer": "B", "answerText": "B. set up the authentication app again on your new phone.", "start": 196.0, "end": 213.8, "transcript": [{"speaker": "Speaker 1", "text": "And if I lose or replace my phone?"}, {"speaker": "Speaker 2", "text": "Then you'll need to reinstall the authentication app on your new device and go through the setup again."}, {"speaker": "Speaker 2", "text": "Some services allow you to transfer your 2FA settings, but it's always wise to have backups ready just in case."}]}, {"id": "Q8", "type": "mcq", "stem": "2FA is important because it", "options": [{"key": "A", "text": "takes only a little time to set up."}, {"key": "B", "text": "expands the defences of your accounts."}, {"key": "C", "text": "prevents cyberattacks."}], "answer": "B", "answerText": "B. expands the defences of your accounts.", "start": 214.0, "end": 227.8, "transcript": [{"speaker": "Speaker 1", "text": "It does sound like a bit of work, which I hate, but I can see how it makes my accounts much more secure."}, {"speaker": "Speaker 2", "text": "Exactly."}, {"speaker": "Speaker 2", "text": "It takes just a little time to set up, but it adds a powerful layer of protection against hackers and identity theft."}]}];
+const IPA = {"a": "/ə/", "absolutely": "/ˌæbsʌlˈutli/", "accepted": "/æksˈɛptɪd/", "access": "/ˈæksˌɛs/", "account": "/ʌkˈaʊnt/", "accounts": "/ʌkˈaʊnts/", "across": "/ʌkɹˈɔs/", "activate": "/ˈæktʌvˌeɪt/", "add": "/ˈæd/", "address": "/ˈædɹˌɛs/", "adds": "/ˈædz/", "after": "/ˈæftɚ/", "again": "/ʌɡˈɛn/", "against": "/ʌɡˈɛnst/", "alex": "/ˈælʌks/", "all": "/ˈɔl/", "allow": "/ʌlˈaʊ/", "also": "/ˈɔlsoʊ/", "always": "/ˈɔlwˌeɪz/", "amazing": "/ʌmˈeɪzɪŋ/", "an": "/ən/", "and": "/ænd/", "another": "/ʌnˈʌðɚ/", "any": "/ˈɛni/", "app": "/ˈæp/", "apps": "/ˈæps/", "are": "/ɑr/", "as": "/ˈæz/", "authentication": "/ɔθˌɛntʌkˈeɪʃʌn/", "automatically": "/ˌɔtʌmˈætɪkli/", "backup": "/bˈækˌʌp/", "backups": "/bˈækˌʌps/", "be": "/bˈi/", "best": "/bˈɛst/", "bit": "/bˈɪt/", "both": "/bˈoʊθ/", "but": "/bˈʌt/", "by": "/bˈaɪ/", "camera": "/kˈæmɚʌ/", "can": "/kˈæn/", "case": "/kˈeɪs/", "code": "/kˈoʊd/", "codes": "/kˈoʊdz/", "come": "/kˈʌm/", "comes": "/kˈʌmz/", "common": "/kˈɑmʌn/", "confirms": "/kʌnfˈɚmz/", "connect": "/kʌnˈɛkt/", "considered": "/kʌnsˈɪdɚd/", "correctly": "/kɚˈɛktli/", "create": "/kɹiˈeɪt/", "crucial": "/kɹˈuʃʌl/", "depend": "/dɪpˈɛnd/", "device": "/dɪvˈaɪs/", "difficult": "/dˈɪfʌkʌlt/", "do": "/dˈu/", "does": "/dˈʌz/", "doesn't": "/dˈʌzʌnt/", "e-mail": "/ˈimˌeɪl/", "effective": "/ɪfˈɛktɪv/", "emma": "/ˈɛmʌ/", "enabled": "/ɛnˈeɪbʌld/", "enabling": "/ɛnˈeɪbʌlɪŋ/", "enhancing": "/ɛnhˈænsɪŋ/", "enter": "/ˈɛntɚ/", "equally": "/ˈikwʌli/", "every": "/ˈɛvɚi/", "exactly": "/ɪɡzˈæktli/", "facial": "/fˈeɪʃʌl/", "factor": "/fˈæktɚ/", "find": "/fˈaɪnd/", "fingerprint": "/fˈɪŋɡɚpɹˌɪnt/", "first": "/fˈɚst/", "for": "/fɔr/", "forms": "/fˈɔɹmz/", "friend": "/fɹˈɛnd/", "from": "/fɹˈʌm/", "generally": "/dʒˈɛnɚʌli/", "generate": "/dʒˈɛnɚˌeɪt/", "generated": "/dʒˈɛnɚˌeɪtʌd/", "generating": "/dʒˈɛnɚˌeɪtɪŋ/", "go": "/ɡˈoʊ/", "going": "/ɡˈoʊɪŋ/", "good": "/ɡˈʊd/", "google": "/ɡˈuɡʌl/", "got": "/ɡˈɑt/", "great": "/ɡɹˈeɪt/", "hackers": "/hˈækɚz/", "happy": "/hˈæpi/", "hate": "/hˈeɪt/", "have": "/hˈæv/", "hear": "/hˈiɹ/", "help": "/hˈɛlp/", "helping": "/hˈɛlpɪŋ/", "hi": "/hˈaɪ/", "highly": "/hˈaɪli/", "how": "/hˈaʊ/", "i": "/ˈaɪ/", "i'll": "/ˈaɪl/", "i'm": "/ˈaɪm/", "i've": "/ˈaɪv/", "identity": "/aɪdˈɛntɪtˌi/", "if": "/ˈɪf/", "important": "/ˌɪmpˈɔɹtʌnt/", "in": "/ɪn/", "include": "/ˌɪnklˈud/", "install": "/ˌɪnstˈɔl/", "installing": "/ˌɪnstˈɔlɪŋ/", "instead": "/ˌɪnstˈɛd/", "intercepted": "/ˌɪntɚsˈɛptʌd/", "into": "/ˈɪntu/", "involves": "/ˌɪnvˈɑlvz/", "is": "/ɪz/", "issues": "/ˈɪʃuz/", "it": "/ˈɪt/", "it's": "/ˈɪts/", "just": "/dʒˈʌst/", "kind": "/kˈaɪnd/", "know": "/nˈoʊ/", "labeled": "/lˈeɪbʌld/", "last": "/lˈæst/", "layer": "/lˈeɪɚ/", "let": "/lˈɛt/", "like": "/lˈaɪk/", "link": "/lˈɪŋk/", "little": "/lˈɪtʌl/", "log": "/lˈɔɡ/", "lose": "/lˈuz/", "lot": "/lˈɑt/", "make": "/mˈeɪk/", "makes": "/mˈeɪks/", "may": "/mˈeɪ/", "me": "/mˈi/", "messages": "/mˈɛsʌdʒʌz/", "method": "/mˈɛθʌd/", "microsoft": "/mˈaɪkɹˌoʊsˈɔft/", "might": "/mˈaɪt/", "more": "/mˈɔɹ/", "most": "/mˈoʊst/", "much": "/mˈʌtʃ/", "my": "/mˈaɪ/", "need": "/nˈid/", "needed": "/nˈidʌd/", "never": "/nˈɛvɚ/", "new": "/nˈu/", "next": "/nˈɛkst/", "of": "/əv/", "on": "/ˈɑn/", "once": "/wˈʌns/", "one": "/wˈʌn/", "one-time": "/wˈʌntˈaɪm/", "online": "/ˈɔnlˌaɪn/", "open": "/ˈoʊpʌn/", "option": "/ˈɑpʃʌn/", "options": "/ˈɑpʃʌnz/", "or": "/ˈɔɹ/", "others": "/ˈʌðɚz/", "password": "/pˈæswˌɚd/", "passwords": "/pˈæswˌɚdz/", "phone": "/fˈoʊn/", "phone's": "/fˈoʊnz/", "platform": "/plˈætfˌɔɹm/", "platforms": "/plˈætfˌɔɹmz/", "plus": "/plˈʌs/", "powerful": "/pˈaʊɚfʌl/", "privacy": "/pɹˈaɪvʌsi/", "process": "/pɹˈɑsˌɛs/", "prompted": "/pɹˈɑmptɪd/", "protection": "/pɹʌtˈɛkʃʌn/", "question": "/kwˈɛstʃʌn/", "ready": "/ɹˈɛdi/", "receiving": "/ɹʌsˈivɪŋ/", "recently": "/ɹˈisʌntli/", "recognition": "/ɹˌɛkʌɡnˈɪʃʌn/", "reduce": "/ɹʌdˈus/", "refresh": "/ɹɪfɹˈɛʃ/", "reinstall": "/ɹˌiɪnstˈɑl/", "replace": "/ɹˌiplˈeɪs/", "requiring": "/ɹikwˈaɪɚɪŋ/", "right": "/ɹˈaɪt/", "risk": "/ɹˈɪsk/", "run": "/ɹˈʌn/", "safe": "/sˈeɪf/", "safely": "/sˈeɪfli/", "scan": "/skˈæn/", "second": "/sˈɛkʌnd/", "secondary": "/sˈɛkʌndˌɛɹi/", "seconds": "/sˈɛkʌndz/", "section": "/sˈɛkʃʌn/", "secure": "/sɪkjˈʊɹ/", "securely": "/sɪkjˈʊɹli/", "security": "/sɪkjˈʊɹʌti/", "see": "/sˈi/", "select": "/sʌlˈɛkt/", "services": "/sˈɚvʌsʌz/", "set": "/sˈɛt/", "setting": "/sˈɛtɪŋ/", "settings": "/sˈɛtɪŋz/", "setup": "/sˈɛtˌʌp/", "share": "/ʃˈɛɹ/", "should": "/ʃˈʊd/", "show": "/ʃˈoʊ/", "shown": "/ʃˈoʊn/", "sign": "/sˈaɪn/", "slightly": "/slˈaɪtli/", "sms": "/ˌɛsˌɛmˈɛs/", "so": "/sˈoʊ/", "some": "/sˈʌm/", "sound": "/sˈaʊnd/", "sounds": "/sˈaʊndz/", "start": "/stˈɑɹt/", "stay": "/stˈeɪ/", "step": "/stˈɛp/", "store": "/stˈɔɹ/", "strong": "/stɹˈɔŋ/", "such": "/sˈʌtʃ/", "support": "/sʌpˈɔɹt/", "sure": "/ʃˈʊɹ/", "takes": "/tˈeɪks/", "tap": "/tˈæp/", "term": "/tˈɚm/", "text": "/tˈɛkst/", "than": "/ðˈæn/", "thanks": "/θˈæŋks/", "that": "/ðˈæt/", "that's": "/ðˈæts/", "the": "/ðə/", "theft": "/θˈɛft/", "them": "/ðˈɛm/", "then": "/ðˈɛn/", "there": "/ðˈɛɹ/", "these": "/ðˈiz/", "think": "/θˈɪŋk/", "this": "/ðˈɪs/", "those": "/ðˈoʊz/", "through": "/θɹˈu/", "time": "/tˈaɪm/", "to": "/tə/", "today": "/tʌdˈeɪ/", "too": "/tˈu/", "transfer": "/tɹænsfˈɚ/", "truly": "/tɹˈuli/", "trusted": "/tɹˈʌstɪd/", "unauthorized": "/ʌnˈɔθɚˌaɪzd/", "understood": "/ˌʌndɚstˈʊd/", "up": "/ˈʌp/", "use": "/jˈus/", "using": "/jˈuzɪŋ/", "usually": "/jˈuʒʌwʌli/", "verification": "/vˌɛɹʌfʌkˈeɪʃʌn/", "verifying": "/vˈɛɹʌfˌaɪɪŋ/", "via": "/vˈaɪʌ/", "walk": "/wˈɔk/", "want": "/wˈɑnt/", "way": "/wˈeɪ/", "website": "/wˈɛbsˌaɪt/", "websites": "/wˈɛbsˌaɪts/", "what": "/wˈʌt/", "what's": "/wˈʌts/", "when": "/wˈɛn/", "which": "/wˈɪtʃ/", "will": "/wˈɪl/", "wise": "/wˈaɪz/", "with": "/wˈɪð/", "work": "/wˈɚk/", "working": "/wˈɚkɪŋ/", "yes": "/jˈɛs/", "you": "/juː/", "you'll": "/jˈul/", "your": "/jʊr/", "2": "/tuː/", "2fa": "/tuː ɛf eɪ/", "30": "/ˈθɜːti/", "authenticator": "/ɔːˈθɛntɪkeɪtəɹ/", "authy": "/ˈɔːθi/", "biometrics": "/ˌbaɪoʊˈmɛtrɪks/", "multi-factor": "/ˌmʌlti ˈfæktər/", "qr": "/ˌkjuː ˈɑːr/", "time-based": "/ˈtaɪm beɪst/", "two-factor": "/ˌtuː ˈfæktər/", "was": "/wʌz/"};
+const EXTRA_IPA = {
+  "2fa":"/tuː ɛf eɪ/","authenticator":"/ɔːˈθɛntɪkeɪtəɹ/","authy":"/ˈɔːθi/",
+  "biometrics":"/ˌbaɪoʊˈmɛtrɪks/","multi-factor":"/ˌmʌlti ˈfæktər/",
+  "qr":"/ˌkjuː ˈɑːr/","time-based":"/ˈtaɪm beɪst/","two-factor":"/ˌtuː ˈfæktər/",
+  "2":"/tuː/","30":"/ˈθɜːti/"
+};
+const GLOSSARY = {
+  "e-mail":["noun","A message sent electronically to an email address."],
+  "time":["noun","A period or point at which something happens."],
+  "walk":["verb","Here, to guide someone through a process step by step."],
+  "best":["adjective","The highest in quality or most suitable."],
+  "comes":["verb","Happens or arrives; here, used to ask what happens next."],
+  "term":["noun","A word or phrase used for a particular idea."],
+  "privacy":["noun","The ability to control who can see or use personal information."],
+  "2fa":["noun/abbreviation","Two-factor authentication: a sign-in method that checks your identity in two different ways."],
+  "two-factor":["adjective","Using two separate checks to confirm that someone is really the account owner."],
+  "authentication":["noun","The process of checking that someone is who they claim to be."],
+  "authenticator":["noun","An app or tool that helps confirm identity, often by generating login codes."],
+  "authy":["proper noun","The name of an authentication app."],
+  "biometrics":["noun","Ways to identify a person using body features, such as a fingerprint or face."],
+  "verification":["noun","The act of checking that something is true or that someone is who they say they are."],
+  "unauthorized":["adjective","Done or accessed without permission."],
+  "access":["noun/verb","The ability or permission to enter, use, or reach something."],
+  "account":["noun","A personal profile used to access a website, app, or online service."],
+  "activate":["verb","To make something start working or become active."],
+  "security":["noun","Protection from danger, loss, or unwanted access."],
+  "privacy":["noun","The ability to control who can see or use personal information."],
+  "section":["noun","One part of a larger document, website, or system."],
+  "settings":["noun","Controls that let you change how an app or account works."],
+  "factor":["noun","One part or element of something; here, one way to verify identity."],
+  "receiving":["verb (ing-form)","Getting or being sent something."],
+  "sms":["noun/abbreviation","Short Message Service; text messages sent to a mobile phone."],
+  "code":["noun","A set of letters or numbers used to identify, unlock, or verify something."],
+  "app":["noun","A software application, especially one used on a phone or computer."],
+  "platform":["noun","An online system or service where people use tools or content."],
+  "fingerprint":["noun","The pattern of lines on a fingertip, which can help identify a person."],
+  "facial":["adjective","Related to the face."],
+  "recognition":["noun","The act of identifying someone or something."],
+  "intercepted":["verb (past participle)","Caught or stopped while moving from one place to another."],
+  "messages":["noun","Pieces of information sent from one person or system to another."],
+  "time-based":["adjective","Changing or working according to time."],
+  "one-time":["adjective","Used or valid only once."],
+  "password":["noun","A secret word or string of characters used to sign in."],
+  "refresh":["verb","To update or renew something."],
+  "link":["verb/noun","To connect one thing to another."],
+  "qr":["noun/abbreviation","Quick Response; a square, scannable code that can store information."],
+  "scan":["verb","To use a camera or scanner to read information from an image or code."],
+  "website":["noun","A set of related pages on the internet."],
+  "connect":["verb","To join or link things together."],
+  "generate":["verb","To produce or create something."],
+  "prompted":["verb (past tense)","Asked or instructed someone to do something."],
+  "setup":["noun","The process of preparing or configuring something so it can be used."],
+  "confirm":["verb","To show or check that something is correct or true."],
+  "enabled":["adjective/verb","Made active or possible to use."],
+  "layer":["noun","One level or part placed over or added to another."],
+  "protection":["noun","The act of keeping someone or something safe."],
+  "backup":["noun/adjective","An extra copy or alternative plan used if the main one fails."],
+  "secondary":["adjective","Additional; coming after or alongside the first."],
+  "trusted":["adjective","Believed to be reliable or safe."],
+  "device":["noun","A piece of electronic equipment, such as a phone or computer."],
+  "crucial":["adjective","Extremely important."],
+  "securely":["adverb","In a safe way that reduces the chance of loss or unwanted access."],
+  "reinstall":["verb","To install an app or program again."],
+  "transfer":["verb","To move something from one place, device, or account to another."],
+  "hackers":["noun","People who use computer skills to access systems; here, people who may break in without permission."],
+  "identity":["noun","Who a person is; the information that distinguishes them from others."],
+  "theft":["noun","The act of stealing something."],
+  "risk":["noun","The possibility that something bad or harmful may happen."],
+  "method":["noun","A way of doing something."],
+  "enhancing":["verb (ing-form)","Improving or making something better."],
+  "effective":["adjective","Producing the result that is wanted."],
+  "reduce":["verb","To make something smaller or lower."],
+  "forms":["noun","Types or kinds; in this recording, different types of verification."],
+  "passwords":["noun","Secret words or strings used to sign in to accounts."],
+  "online":["adjective/adverb","Connected to or using the internet."],
+  "process":["noun","A series of steps taken to do something."],
+  "enabling":["verb (ing-form)","Making something possible or active."],
+  "option":["noun","A choice that is available."],
+  "options":["noun","Choices that are available."],
+  "biometrics":["noun","Identification using physical features such as fingerprints or facial features."],
+  "install":["verb","To put an app or program onto a device so it can be used."],
+  "installing":["verb (ing-form)","Putting an app or program onto a device."],
+  "phone":["noun","A device used to make calls, send messages, or run apps."],
+  "camera":["noun","A device that takes pictures or records video."],
+  "automatically":["adverb","Without needing someone to do each step manually."],
+  "correctly":["adverb","In the right or accurate way."],
+  "backup codes":["noun phrase","Extra one-time codes that can help you access an account if your usual method is unavailable."],
+  "services":["noun","Organizations or online systems that provide something people use."],
+  "address":["noun","Details used to identify where a message or person should be sent; here, an email address."],
+  "trusted device":["noun phrase","A phone or computer that has already been approved as safe to use with an account."],
+  "log":["verb","To record information; in 'log in', to enter an account."],
+  "sign":["noun","A mark, symbol, or indication."],
+  "plus":["noun/adjective","The symbol +; it can mean add or an additional amount."],
+  "tap":["verb","To touch a screen briefly with a finger."],
+  "term":["noun","A word or phrase used for a particular idea."],
+  "risk":["noun","The possibility of harm or loss."],
+  "identity theft":["noun phrase","Using another person's personal information without permission, often for fraud."],
+  "friend":["noun","A person you know well and like or trust."],
+  "absolutely":["adverb","Completely; used informally to mean 'yes, certainly'."],
+  "recently":["adverb","Not long ago."],
+  "involves":["verb","Includes or requires something as part of an activity."],
+  "highly":["adverb","To a great degree."],
+  "unauthorized access":["noun phrase","Entering or using an account or system without permission."],
+  "secure":["verb/adjective","To protect something; or safe from danger or unwanted access."],
+  "privacy":["noun","The right to keep personal information or activities from being seen by others."],
+  "labeled":["verb/adjective","Marked with a name or description."],
+  "multi-factor":["adjective","Using more than one kind of check to confirm identity."],
+  "common":["adjective","Happening often or found frequently."],
+  "verifying":["verb (ing-form)","Checking that something is true or that a person is who they claim to be."],
+  "via":["preposition","By way of; using a particular route or method."],
+  "considered":["verb","Thought of or judged to be a certain way."],
+  "generally":["adverb","Usually or in most cases."],
+  "intercept":["verb","To stop or catch something while it is travelling."],
+  "one-time passwords":["noun phrase","Codes that are valid for one login or a short period rather than being reused."],
+  "recovery":["noun","The process of getting access or control back after a problem."],
+  "backup method":["noun phrase","An alternative way to access an account if the usual method is unavailable."],
+  "secondary email":["noun phrase","An additional email address that can help with account recovery."],
+  "recovery email":["noun phrase","An email address used to help regain access to an account."],
+  "settings":["noun","Controls that allow you to change how an account or app works."],
+  "a":["determiner","Used before a singular countable noun when it is not a specific one."],
+  "an":["determiner","Used before a singular countable noun that begins with a vowel sound."],
+  "the":["determiner","Used before a noun when the speaker means a particular person or thing."],
+  "and":["conjunction","Joins words, phrases, or ideas."],
+  "or":["conjunction","Introduces another possibility or choice."],
+  "but":["conjunction","Connects ideas that contrast with each other."],
+  "if":["conjunction","Introduces a condition; it means 'on the condition that'."],
+  "when":["conjunction/adverb","At the time that something happens."],
+  "than":["conjunction/preposition","Used to compare two people or things."],
+  "as":["preposition/conjunction","Can mean 'in the role of', 'while', or 'because', depending on context."],
+  "by":["preposition","Can show who does something, how something is done, or the means used."],
+  "of":["preposition","Shows a relationship between things, such as belonging or part of a whole."],
+  "to":["preposition/particle","Often marks direction, purpose, or the infinitive form of a verb."],
+  "in":["preposition","Inside something, or within a place, period, or situation."],
+  "on":["preposition/adverb","Touching a surface; also used for something operating or active."],
+  "from":["preposition","Shows the starting point or source."],
+  "with":["preposition","Together with, or using something."],
+  "through":["preposition/adverb","From one side to the other, or by means of something."],
+  "into":["preposition","To the inside of something."],
+  "for":["preposition","Shows purpose, intended recipient, or duration."],
+  "about":["preposition/adverb","On the subject of; concerning."],
+  "this":["determiner/pronoun","Refers to a person or thing near in the situation or being discussed."],
+  "that":["determiner/pronoun","Refers to a particular person, thing, or idea."],
+  "these":["determiner/pronoun","Plural of 'this'; refers to particular nearby things."],
+  "those":["determiner/pronoun","Plural of 'that'; refers to particular things farther away or already mentioned."],
+  "it":["pronoun","Refers to a thing, situation, or idea already mentioned."],
+  "they":["pronoun","Refers to people or things already mentioned."],
+  "you":["pronoun","Refers to the person or people being spoken to."],
+  "your":["determiner","Shows that something belongs to or is connected with the person being spoken to."],
+  "i":["pronoun","The person speaking."],
+  "me":["pronoun","The person speaking, when they receive an action."],
+  "we":["pronoun","The speaker and one or more other people."],
+  "my":["determiner","Shows that something belongs to the speaker."],
+  "both":["determiner/pronoun","The two people or things together."],
+  "some":["determiner/pronoun","An amount or number that is not exact or specified."],
+  "most":["determiner/adverb","The greatest part or number; in many cases."],
+  "more":["determiner/adverb","A greater amount or number."],
+  "another":["determiner/pronoun","One more, or a different one."],
+  "other":["determiner/adjective","Different from the one already mentioned."],
+  "any":["determiner/pronoun","One or more, without specifying exactly which."],
+  "every":["determiner","Each individual one in a group."],
+  "all":["determiner/pronoun","The whole amount or every member of a group."],
+  "each":["determiner/pronoun","Every individual member of a group."],
+  "one":["number/determiner","The number 1; a single person or thing."],
+  "first":["adjective/adverb","Coming before all others in order."],
+  "second":["adjective/noun","Coming after the first; also the number 2."],
+  "next":["adjective/adverb","Coming immediately after the present one."],
+  "last":["adjective","Most recent or coming at the end."],
+  "once":["adverb/conjunction","One time; or at the time when something happens."],
+  "again":["adverb","One more time."],
+  "always":["adverb","At all times or on every occasion."],
+  "usually":["adverb","In most cases; most of the time."],
+  "generally":["adverb","Usually or in most cases."],
+  "never":["adverb","At no time."],
+  "recently":["adverb","Not long ago."],
+  "slightly":["adverb","A little; by a small amount."],
+  "exactly":["adverb","Precisely; with no difference or mistake."],
+  "just":["adverb","Only; or a short time ago, depending on context."],
+  "too":["adverb","Also; or more than is wanted or needed."],
+  "so":["adverb/conjunction","To that degree; or used to show a result."],
+  "then":["adverb","At that time, or next in a sequence."],
+  "there":["adverb","In that place; it can also introduce a sentence, as in 'there is'."],
+  "here":["adverb","In this place."],
+  "how":["adverb","In what way or by what method."],
+  "what":["pronoun/determiner","Asks about a thing, information, or kind."],
+  "which":["pronoun/determiner","Asks about or identifies one or more items from a group."],
+  "who":["pronoun","Asks about or refers to a person."],
+  "why":["adverb","Asks for a reason."],
+  "where":["adverb","Asks about a place."],
+  "yes":["response","Used to agree or answer positively."],
+  "no":["response/determiner","A negative answer; or used to mean not any."],
+  "good":["adjective","Positive, useful, or of an acceptable quality."],
+  "great":["adjective","Very good or impressive."],
+  "strong":["adjective","Powerful; not easily broken or defeated."],
+  "safe":["adjective","Protected from danger or harm."],
+  "safely":["adverb","In a way that avoids danger or harm."],
+  "important":["adjective","Having great value or meaning."],
+  "powerful":["adjective","Very strong or effective."],
+  "difficult":["adjective","Not easy to do or understand."],
+  "little":["adjective/determiner","Small in size or amount."],
+  "much":["determiner/adverb","A large amount or degree."],
+  "bit":["noun","A small amount or short period."],
+  "kind":["noun/adjective","A type or category; as an adjective, caring or helpful."],
+  "way":["noun","A method or manner of doing something."],
+  "work":["noun/verb","An activity or task; or to function as intended."],
+  "sound":["noun/verb","Something heard; or to seem a certain way."],
+  "right":["adjective/noun","Correct; or a direction/entitlement, depending on context."],
+  "sure":["adjective","Certain or confident."],
+  "wise":["adjective","Showing good judgment."],
+  "happy":["adjective","Feeling pleased or glad."],
+  "truly":["adverb","Genuinely or really."],
+  "amazing":["adjective","Very surprising, impressive, or good."],
+  "crucial":["adjective","Extremely important to success or safety."],
+  "effective":["adjective","Successful in producing the intended result."],
+  "common":["adjective","Happening often or found frequently."],
+  "recently":["adverb","Not long ago."],
+  "absolutely":["adverb","Completely; also used to say 'certainly'."],
+  "understood":["verb/adjective","Understood means that someone has grasped the meaning."],
+  "accepted":["verb/adjective","Approved or agreed to."],
+  "enabled":["verb/adjective","Made active or possible to use."],
+  "automatically":["adverb","Without someone needing to carry out each step."],
+  "correctly":["adverb","In the right or accurate way."],
+  "equally":["adverb","To the same degree or amount."],
+  "highly":["adverb","To a great degree."],
+  "generally":["adverb","Usually or in most cases."],
+  "recently":["adverb","Not long ago."],
+  "absolutely":["adverb","Completely; certainly."],
+  "hi":["interjection","An informal greeting."],
+  "thanks":["expression","A way to show gratitude."],
+  "help":["verb/noun","To make something easier for someone; or assistance."],
+  "helping":["verb (ing-form)","Giving assistance."],
+  "friend":["noun","A person you know well and like or trust."],
+  "today":["noun/adverb","The current day."],
+  "stay":["verb","To remain in a place or condition."],
+  "start":["verb/noun","To begin; or the beginning of something."],
+  "finish":["verb/noun","To complete; or the end of something."],
+  "let":["verb","To allow someone to do something."],
+  "want":["verb","To wish for or desire something."],
+  "need":["verb/noun","To require something; or a requirement."],
+  "should":["modal verb","Used to give advice or say what is advisable."],
+  "will":["modal verb","Used to talk about the future or willingness."],
+  "may":["modal verb","Used to show possibility or permission."],
+  "might":["modal verb","Used to show possibility."],
+  "can":["modal verb","Used to show ability or possibility."],
+  "have":["verb","To possess, experience, or be required to do something."],
+  "be":["verb","A verb used to describe a state or identity."],
+  "is":["verb","Present form of 'be' used with he, she, it, or a singular noun."],
+  "are":["verb","Present form of 'be' used with you, we, they, or plural nouns."],
+  "was":["verb","Past form of 'be' for I, he, she, or it."],
+  "do":["verb/auxiliary","To perform an action; also used to form questions and negatives."],
+  "does":["verb/auxiliary","Form of 'do' used with he, she, or it."],
+  "go":["verb","To move or travel; in 'go through', to experience or follow steps."],
+  "come":["verb","To move toward someone or something; or happen."],
+  "show":["verb","To make something visible or let someone see it."],
+  "shown":["verb (past participle)","Displayed or made visible."],
+  "find":["verb","To discover or locate something."],
+  "think":["verb","To use your mind to form an idea or opinion."],
+  "know":["verb","To have information or understanding about something."],
+  "see":["verb","To notice with your eyes; also to understand."],
+  "hear":["verb","To notice or receive sound."],
+  "create":["verb","To make something new."],
+  "make":["verb","To create, produce, or cause something."],
+  "add":["verb","To put something together with something else."],
+  "enter":["verb","To type or put information into a system."],
+  "open":["verb/adjective","To make something accessible; or not closed."],
+  "select":["verb","To choose something from available options."],
+  "replace":["verb","To put something new in the place of something else."],
+  "lose":["verb","To no longer have something, or be unable to find it."],
+  "share":["verb","To give or allow others to use or see something."],
+  "store":["verb","To keep something for future use."],
+  "use":["verb","To do something with a tool or object for a purpose."],
+  "using":["verb (ing-form)","Employing something to do a task."],
+  "support":["verb/noun","To help or enable; or help that is provided."],
+  "include":["verb","To contain something as part of a whole."],
+  "involves":["verb","Includes or requires something as part of an activity."],
+  "depend":["verb","To be affected or decided by something else."],
+  "allow":["verb","To let something happen or let someone do something."],
+  "require":["verb","To need something or make it necessary."],
+  "requiring":["verb (ing-form)","Needing or making something necessary."],
+  "reduce":["verb","To make something smaller or lower."],
+  "refresh":["verb","To update or renew something."],
+  "prompted":["verb (past tense)","Asked or instructed someone to do something."],
+  "transfer":["verb","To move something from one place or device to another."],
+  "run":["verb","To operate or function; in 'run into', to encounter."],
+  "log":["verb/noun","To record information; in 'log in', to enter an account."],
+  "generating":["verb (ing-form)","Producing or creating something."],
+  "receiving":["verb (ing-form)","Getting something that is sent or given."],
+  "verifying":["verb (ing-form)","Checking that something is true or correct."],
+  "enabling":["verb (ing-form)","Making something possible or active."],
+  "enhancing":["verb (ing-form)","Improving or making something better."],
+  "setting":["noun/verb","A control or configuration; or the act of placing something."],
+  "settings":["noun","Controls that let you change how an app or account works."],
+  "setup":["noun","The process of preparing or configuring something for use."],
+  "phone's":["possessive form","Means 'belonging to the phone'."],
+  "i'll":["contraction","Short for 'I will'."],
+  "i'm":["contraction","Short for 'I am'."],
+  "i've":["contraction","Short for 'I have'."],
+  "you'll":["contraction","Short for 'you will'."],
+  "it's":["contraction","Usually short for 'it is' or 'it has', depending on context."],
+  "that's":["contraction","Short for 'that is' or 'that has', depending on context."],
+  "what's":["contraction","Short for 'what is' or 'what has', depending on context."],
+  "doesn't":["contraction","Short for 'does not'."],
+  "google":["proper noun","A technology company; in the recording, part of an authentication app's name."],
+  "microsoft":["proper noun","A technology company; in the recording, part of an authentication app's name."],
+  "emma":["proper noun","A person's name in the dialogue."],
+  "alex":["proper noun","A person's name in the dialogue."]
+};
+function escapeHTML(value){
+  return String(value).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+}
+function normalize(value){
+  return String(value || "").toLowerCase().trim().replace(/[’]/g,"'").replace(/\s+/g," ").replace(/[.!?]+$/g,"");
+}
+function questionCard(q){
+  const tag = `<div class="qtop"><span class="qtag">${q.id}</span><span class="qtype">${q.type==="mcq"?"Choose one answer":"Fill in the gap"}</span></div>`;
+  let prompt = "";
+  if(q.type==="mcq"){
+    prompt = `<h3>${escapeHTML(q.stem)}</h3><fieldset class="options" aria-label="${q.id} options">`+
+      q.options.map(o=>`<label class="option"><input type="radio" name="${q.id}" value="${o.key}"><span class="option-letter">${o.key}.</span><span class="option-text">${escapeHTML(o.text)}</span></label>`).join("")+
+      `</fieldset>`;
+  } else {
+    prompt = `<h3>${escapeHTML(q.stem)}</h3><p class="gap-sentence">${escapeHTML(q.before)}<input class="gap-input" id="answer-${q.id}" name="${q.id}" type="text" autocomplete="off" aria-label="${q.id} answer" spellcheck="false">${escapeHTML(q.after)}</p>`;
+  }
+  return `<section class="question-card" id="card-${q.id}" data-qid="${q.id}">${tag}${prompt}
+    <div class="feedback" id="feedback-${q.id}" hidden></div>
+    <div class="post-submit" id="post-${q.id}" hidden>
+      <div class="clip-row">
+        <audio controls preload="none" data-clip="${q.id}" src="${q.id}.mp3"></audio>
+        <button class="toggle-transcript" type="button" data-transcript="${q.id}" aria-expanded="false">Show transcript</button>
+      </div>
+      <div class="clip-note" id="clip-note-${q.id}">Replay this question's audio clip. Transcript and word help are available here.</div>
+      <div class="transcript" id="transcript-${q.id}" hidden></div>
+    </div>
+  </section>`;
+}
+const questionsRoot = document.getElementById("questions");
+questionsRoot.innerHTML = QUESTIONS.map(questionCard).join("");
+const form = document.getElementById("quiz-form");
+const submitBtn = document.getElementById("submit-btn");
+const retryBtn = document.getElementById("retry-btn");
+const submitHelp = document.getElementById("submit-help");
+const progressLabel = document.getElementById("progress-label");
+const progressHint = document.getElementById("progress-hint");
+const progressFill = document.getElementById("progress-fill");
+const results = document.getElementById("results");
+let submitted = false;
+
+function answerFor(q){
+  if(q.type==="mcq"){
+    const selected = document.querySelector(`input[name="${q.id}"]:checked`);
+    return selected ? selected.value : "";
+  }
+  const el = document.getElementById(`answer-${q.id}`);
+  return el ? el.value : "";
+}
+function complete(q){ return normalize(answerFor(q)) !== ""; }
+function updateProgress(){
+  const count = QUESTIONS.filter(complete).length;
+  progressLabel.textContent = `${count} of ${QUESTIONS.length} answered`;
+  progressHint.textContent = count===QUESTIONS.length ? "All questions complete" : "Answer every question to submit";
+  progressFill.style.width = `${count / QUESTIONS.length * 100}%`;
+  submitBtn.disabled = submitted || count !== QUESTIONS.length;
+  submitHelp.textContent = count===QUESTIONS.length ? "Ready to check your answers." : `Complete ${QUESTIONS.length-count} more question${QUESTIONS.length-count===1?"":"s"} to unlock submission.`;
+}
+form.addEventListener("input", updateProgress);
+form.addEventListener("change", updateProgress);
+
+function selectedDisplay(q){
+  const answer = answerFor(q);
+  if(q.type==="mcq"){
+    const opt = q.options.find(o=>o.key===answer);
+    return opt ? `${opt.key}. ${opt.text}` : "No answer";
+  }
+  return answer.trim() || "No answer";
+}
+function isCorrect(q){
+  const answer = normalize(answerFor(q));
+  if(q.type==="mcq") return answer === normalize(q.answer);
+  return q.accepted.map(normalize).includes(answer);
+}
+function expectedDisplay(q){
+  if(q.type==="mcq") return q.answerText;
+  return q.answerText;
+}
+function makeWordButtons(text){
+  const pieces = text.split(/([\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*)/gu);
+  return pieces.map(piece=>{
+    if(/^[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*$/u.test(piece)){
+      const word = piece.toLowerCase().replace(/’/g,"'");
+      return `<button type="button" class="word" data-word="${escapeHTML(word)}" aria-label="Look up ${escapeHTML(piece)}">${escapeHTML(piece)}</button>`;
+    }
+    return escapeHTML(piece);
+  }).join("");
+}
+function renderTranscript(q){
+  const box = document.getElementById(`transcript-${q.id}`);
+  box.innerHTML = `<p class="transcript-hint">Tap any word for an English meaning, approximate IPA, and part of speech.</p>`+
+    q.transcript.map(t=>`<div class="turn"><div class="speaker">${escapeHTML(t.speaker)}</div><div>${makeWordButtons(t.text)}</div></div>`).join("");
+}
+function fallbackEntry(word){
+  const base = word.replace(/'s$/,"").replace(/s$/,"");
+  if(GLOSSARY[base] && word.endsWith("s")) return ["plural / verb form",`A plural form or a verb form of “${base}”: ${GLOSSARY[base][1].charAt(0).toLowerCase()+GLOSSARY[base][1].slice(1)}`];
+  if(word.endsWith("ing")){
+    const root = word.slice(0,-3);
+    if(GLOSSARY[root]) return ["verb (ing-form)",`The action or process of ${root}; ${GLOSSARY[root][1].charAt(0).toLowerCase()+GLOSSARY[root][1].slice(1)}`];
+    return ["verb (ing-form)","An -ing form, often used for an action in progress or as the name of an activity."];
+  }
+  if(word.endsWith("ed")){
+    const root = word.slice(0,-2);
+    if(GLOSSARY[root]) return ["verb (past form)",`The past form of “${root}”: ${GLOSSARY[root][1]}`];
+    return ["verb (past form)","A past-tense or past-participle form, usually describing an action that happened earlier."];
+  }
+  if(word.endsWith("ly")){
+    const root = word.slice(0,-2);
+    if(GLOSSARY[root]) return ["adverb",`In a ${root} way; ${GLOSSARY[root][1]}`];
+    return ["adverb","A word that describes how, when, or to what degree an action happens."];
+  }
+  if(word==="30") return ["number","The number thirty."];
+  if(word==="2") return ["number","The number two."];
+  if(word==="2fa") return GLOSSARY["2fa"];
+  if(word==="qr") return GLOSSARY["qr"] || ["abbreviation","Quick Response; a square code that can be scanned by a camera."];
+  if(word==="authy") return GLOSSARY["authy"];
+  if(word==="biometrics") return GLOSSARY["biometrics"];
+  if(word==="time-based") return GLOSSARY["time-based"];
+  if(word==="two-factor") return GLOSSARY["two-factor"];
+  if(word==="multi-factor") return GLOSSARY["multi-factor"];
+  if(word==="authenticator") return GLOSSARY["authenticator"];
+  if(word==="e-mail") return ["noun","A message sent electronically to an email address."];
+  if(word==="phone's") return GLOSSARY["phone's"];
+  if(word==="i'll"||word==="i'm"||word==="i've"||word==="you'll"||word==="it's"||word==="that's"||word==="what's"||word==="doesn't") return GLOSSARY[word] || ["contraction","A shortened form of two words."];
+  return ["word in context","This word is used in the recording. Its precise meaning depends on the sentence around it."];
+}
+function showDictionary(word){
+  const key = String(word).toLowerCase().replace(/’/g,"'");
+  const entry = GLOSSARY[key] || fallbackEntry(key);
+  const ipa = IPA[key] || EXTRA_IPA[key] || "/pronunciation not listed/";
+  document.getElementById("dict-word").textContent = word;
+  document.getElementById("dict-pos").textContent = entry[0];
+  document.getElementById("dict-ipa").textContent = `IPA (approx.): ${ipa}`;
+  document.getElementById("dict-definition").textContent = entry[1];
+  document.getElementById("dictionary").hidden = false;
+}
+document.getElementById("dict-close").addEventListener("click",()=>document.getElementById("dictionary").hidden=true);
+document.addEventListener("click",event=>{
+  const wordBtn = event.target.closest(".word");
+  if(wordBtn){ showDictionary(wordBtn.dataset.word); return; }
+  const transcriptBtn = event.target.closest("[data-transcript]");
+  if(transcriptBtn && submitted){
+    const qid = transcriptBtn.dataset.transcript;
+    const q = QUESTIONS.find(item=>item.id===qid);
+    const box = document.getElementById(`transcript-${qid}`);
+    if(box.innerHTML.trim()==="") renderTranscript(q);
+    box.hidden = !box.hidden;
+    transcriptBtn.textContent = box.hidden ? "Show transcript" : "Hide transcript";
+    transcriptBtn.setAttribute("aria-expanded",String(!box.hidden));
+  }
+});
+function stopOtherAudio(current){
+  document.querySelectorAll("audio").forEach(audio=>{
+    if(audio!==current){ audio.pause(); try{audio.currentTime=0;}catch(e){} }
+  });
+}
+document.querySelectorAll("audio").forEach(audio=>{
+  audio.addEventListener("play",()=>stopOtherAudio(audio));
+  audio.addEventListener("error",()=>{
+    const clip = audio.dataset.clip;
+    const note = clip ? document.getElementById(`clip-note-${clip}`) : null;
+    if(note) note.textContent = `Could not load ${clip}.mp3. Place that clip in the same folder as this HTML file.`;
+  });
+});
+form.addEventListener("submit",event=>{
+  event.preventDefault();
+  if(submitted) return;
+  const missing = QUESTIONS.find(q=>!complete(q));
+  if(missing){
+    const card = document.getElementById(`card-${missing.id}`);
+    card.scrollIntoView({behavior:"smooth",block:"center"});
+    const field = missing.type==="mcq" ? card.querySelector("input[type=radio]") : document.getElementById(`answer-${missing.id}`);
+    if(field) field.focus({preventScroll:true});
+    return;
+  }
+  submitted = true;
+  let score = 0;
+  QUESTIONS.forEach(q=>{
+    const correct = isCorrect(q);
+    if(correct) score++;
+    const feedback = document.getElementById(`feedback-${q.id}`);
+    feedback.hidden = false;
+    feedback.className = `feedback ${correct?"correct":"incorrect"}`;
+    feedback.innerHTML = `<strong>${correct?"Correct":"Not quite"}</strong><div><b>Your answer:</b> ${escapeHTML(selectedDisplay(q))}</div><div><b>Correct answer:</b> ${escapeHTML(expectedDisplay(q))}</div>`;
+    document.getElementById(`post-${q.id}`).hidden = false;
+    document.getElementById(`card-${q.id}`).querySelectorAll("input").forEach(input=>input.disabled=true);
+  });
+  const percent = Math.round(score/QUESTIONS.length*100);
+  results.hidden = false;
+  results.innerHTML = `<div class="scoreline"><span class="scorebig">${score}/${QUESTIONS.length}</span><span><b>${percent}%</b><br><span class="muted">Your listening score</span></span></div><p>${percent===100?"Excellent work — all answers are correct.":percent>=75?"Good work. Review any incorrect answers and replay their clips.":"Review the feedback, replay the clips, and use the transcripts to check what you heard."}</p>`;
+  results.scrollIntoView({behavior:"smooth",block:"start"});
+  submitBtn.hidden = true;
+  submitHelp.hidden = true;
+  retryBtn.hidden = false;
+  progressHint.textContent = "Submitted";
+  document.querySelector(".listening-panel").classList.add("submitted");
+});
+retryBtn.addEventListener("click",()=>{
+  submitted = false;
+  form.reset();
+  document.getElementById("dictionary").hidden = true;
+  results.hidden = true;
+  results.innerHTML = "";
+  QUESTIONS.forEach(q=>{
+    document.getElementById(`feedback-${q.id}`).hidden = true;
+    document.getElementById(`post-${q.id}`).hidden = true;
+    const box = document.getElementById(`transcript-${q.id}`);
+    box.hidden = true; box.innerHTML = "";
+    const btn = document.querySelector(`[data-transcript="${q.id}"]`);
+    btn.textContent = "Show transcript"; btn.setAttribute("aria-expanded","false");
+    document.getElementById(`card-${q.id}`).querySelectorAll("input").forEach(input=>input.disabled=false);
+  });
+  submitBtn.hidden = false;
+  submitHelp.hidden = false;
+  retryBtn.hidden = true;
+  updateProgress();
+  document.querySelector(".hero").scrollIntoView({behavior:"smooth",block:"start"});
+});
+updateProgress();
+</script>
+</body>
+</html>
